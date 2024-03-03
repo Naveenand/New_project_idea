@@ -1,7 +1,7 @@
 import os
 from textSummarizer.logging import logger
 from transformers import AutoTokenizer
-from datasets import load_dataset, load_from_disk
+from datasets import load_dataset, load_from_disk,DatasetDict
 from textSummarizer.config.configuration import DataTransformationConfig
 
 
@@ -28,6 +28,21 @@ class DataTransformation:
     def convert(self):
         dataset_samsum = load_from_disk(self.config.data_path)
          # Efficiently select the first 10 rows using `select()`
+        
+        ### because I am using cpu ###
+
+        # Select only the first three rows from the "train" split
+        train_dataset = dataset_samsum["train"].select([0, 1])
+        
+        # Select only the first three rows from the "validation" split
+        validation_dataset = dataset_samsum["validation"].select([0])
+        
+        # Create a DatasetDict with "train" and "validation" keys
+        dataset_samsum = DatasetDict({
+            "train": train_dataset,
+            "validation": validation_dataset,
+        })
+
         #dataset_samsum = dataset_samsum.select(range(10)) 
         dataset_samsum_pt = dataset_samsum.map(self.convert_examples_to_features, batched = True)
         dataset_samsum_pt.save_to_disk(os.path.join(self.config.root_dir,"samsum_dataset"))
