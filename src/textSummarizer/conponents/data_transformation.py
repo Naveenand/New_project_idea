@@ -37,10 +37,13 @@ class DataTransformation:
         # Select only the first three rows from the "validation" split
         validation_dataset = dataset_samsum["validation"].select([0])
         
+        test_dataset = dataset_samsum['test'].select([0])
+
         # Create a DatasetDict with "train" and "validation" keys
         dataset_samsum = DatasetDict({
             "train": train_dataset,
             "validation": validation_dataset,
+            'test': validation_dataset
         })
 
         #dataset_samsum = dataset_samsum.select(range(10)) 
